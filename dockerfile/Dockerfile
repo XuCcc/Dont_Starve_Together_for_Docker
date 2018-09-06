@@ -1,6 +1,6 @@
 FROM ubuntu
 MAINTAINER Thoxvi <A@Thoxvi.com>
-COPY ./sources.list /etc/apt/sources.list
+RUN sed -i "s/http:\/\/archive.ubuntu.com/http:\/\/mirrors.aliyun.com/g" /etc/apt/sources.list
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
     apt-get install -y lib32gcc1 libcurl4-gnutls-dev:i386 curl && \
