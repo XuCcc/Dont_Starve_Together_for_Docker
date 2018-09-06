@@ -49,7 +49,7 @@ class DSTSaves(object):
 
     def load(self):
         self.config.read(str(self.path / 'cluster.ini'))
-        print("""Dont Starve Server Config
+        print("""Don't Starve Server Config
 Name: {name}
 Mode: {mode}
 Password: {password}
@@ -60,6 +60,7 @@ Description: {des}""".format(name=self.config.get('NETWORK', 'cluster_name'),
                              max=self.config.get('GAMEPLAY', 'max_players'),
                              des=self.config.get('NETWORK', 'cluster_description')))
 
+    @property
     def parse(self):
         """
         :return: list
@@ -67,6 +68,22 @@ Description: {des}""".format(name=self.config.get('NETWORK', 'cluster_name'),
         modoverrides = self.path / 'Master/modoverrides.lua'
         with modoverrides.open('r') as f:
             return Message.mods_pattern.findall(f.read())
+
+    def start(self, detach: bool):
+        self.load()
+        print('Find Mods: {}'.format(self.parse))
+        self.mods.setup(self.parse)
+        docker = self.path / 'docker-compose.yml'
+        with docker.open('w') as f:
+            f.write(Message.docker_compose.format(
+                    name=self.config.get('NETWORK', 'cluster_name'),
+                    save=self.path.absolute(),
+                    mod=self.mods.path.absolute()
+            ))
+        options = '-d' if detach else ''
+        os.chdir(str(self.path))
+        os.system('docker-compose up {}'.format(options))
+
 
 
 pass_save = click.make_pass_decorator(DSTSaves)
@@ -87,17 +104,14 @@ class App(object):
     @cli.command()
     @pass_save
     def mods(save):
-        ids = save.parse()
-        for id in ids:
+        for id in save.parse:
             print('Mod: {}'.format(id))
 
     @cli.command()
     @click.option('--detach', '-d', default=False, is_flag=True, help='Run containers in the background')
     @pass_save
     def start(save, detach):
-        options = '-d' if detach else ''
-        os.chdir(str(save.path))
-        os.system('docker-compose up {}'.format(options))
+        save.start(detach)
 
 
 if __name__ == '__main__':
