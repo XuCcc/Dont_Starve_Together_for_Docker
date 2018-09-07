@@ -109,23 +109,23 @@ class App(object):
     def cli(ctx, dir):
         ctx.obj = DSTSaves(dir)
 
-    @cli.command()
+    @cli.command(help='Load Config file')
     @pass_save
     def load(save):
         save.load()
 
-    @cli.command()
+    @cli.command(help='Load mods id')
     @pass_save
     def mods(save):
         for id in save.parse:
             print('Mod: {}'.format(id))
 
-    @cli.command()
+    @cli.command(help='Confirm token')
     @pass_save
     def token(save):
         save.confirm_token()
 
-    @cli.command()
+    @cli.command(help='startup service')
     @click.option('--detach', '-d', default=False, is_flag=True, help='Run containers in the background')
     @pass_save
     def start(save, detach):

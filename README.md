@@ -1,56 +1,60 @@
-# Dont-Starve-Together-Docker-Cluster
+<h1 align="center">Don't Starve Together Server of Docker</h1>
 
-根据配置文件快速建立饥荒联机版 (DST)Docker 集群
+Run your DST Server from local save.
+> 从本地存档快速搭建DST服务器
 
-## 运行状况
+## Usage
 
-- 镜像大约 `580m`，包括底层 Ubuntu 镜像的话大约 `1G`
-- 大概每个实例(带洞穴的)占内存`1G`左右，CPU似乎不怎么占用
-- 存档在生成的 `data/名字/Master/save` 里面，要备份的话，请用 `chown` 到自己的用户名，再进行备份
-- Mod的话请查看 `./template/dedicated_server_mods_setup.lua` 文件，有具体说明，建议 PC 机先建立一个世界，再把 Mod 配置好，最后再复制到对应位置( `dedicated_server_mods_setup.lua` 文件需要自行整理)
+1. Find your saves in `sdf`(Windows) or `sdf`(Unix),upload into your vps.
 
-## 运行环境配置
+   > 在用户根目录下的`somewhere`找到存档文件,上传到你的服务器上
 
-### 不推荐使用 Windows
+2. `git clone https://github.com/XuCcc/Dont_Starve_Together_of_Docker.git`
 
-如果需要使用，则需要手动修改 Python 脚本文件中的对应 `mkdir cp` 等命令——因为这里是直接使用 `system(shell)` 脚本实现的。
+3. Install python packages `pip install -r requirements.txt` or `pipenv install --dev`
 
-### Python3 环境配置
+   > 安装依赖包 `pip install -r requirements.txt` 或者使用 `pipenv install --dev`
 
-1. 在 [Python官网](https://www.python.org/downloads/)下载对应自己操作系统的安装包
-2. 然后安装环境，再配置环境变量(如果没有自动配置的话)
+4. Run service `python dst.py path_to_save start`
 
-### Docker环境配置
+   > 启动服务
 
-1. 请根据自己的操作系统，在 [Docker 官方网站](https://docs.docker.com/engine/installation/#server)选择适合的 **DockerCE**
-2. 如果是 Linux 的话，最好把自己的管理员用户添加到 Docker 用户组里，以免每次打命令都得加入 sudo，命令：`sudo usermod -aG docker $USER`
-3. 安装 `docker-compose` :如果你是 Ubuntu ，可以直接使用命令:`sudo apt install docker-compose`，如果不是，请前往 [Docker官方网站](https://docs.docker.com/compose/install/)，并寻找自己的操作系统的安装方式
-4. 至此，你应该有了一个正常的 Docker 环境，如果有问题可以根据 END 区的联系方式提交
-
-## 基本使用说明
-
-### 步骤介绍
-
-1. Clone 项目:`git clone https://github.com/Thoxvi/Dont-Starve-Together-Docker-Cluster.git`
-2. 进入目录:`cd ./Dont-Starve-Together-Docker-Cluster`
-3. 根据模板修改 infos 文件，提供一个测试 Token (每一行对应一个实例,# 号注释，如果不需要密码的话请留空对应位置)
-4. 执行生成脚本:`python3 makedata.py`
-5. 转到工作目录:`cd data`
-6. 启动容器:`docker-compose up`
-7. 若不想查看 Log 的话，可以在`启动容器`步骤使用:`docker-compose up -d`
-8. 更新,转到工作目录, `docker-compose stop` , 然后 `docker-compose up -d`
-
-### 一套带走
-
-```shell
-git clone https://github.com/Thoxvi/Dont-Starve-Together-Docker-Cluster.git
-cd ./Dont-Starve-Together-Docker-Cluster
-python3 makedata.py
-cd ./data
-docker-compose up
+```bash
+[?] Your Token [pds-g^KU_SIyU7xC8^BefMQjkrZ8l/3SMeS3pIZPnh/R9qujwAt1cqXjuZoaQ=] is right? [Y/n]:
+[!] Don't Starve Server Config
+Name: Xu
+Mode: survival
+Password: Xuuuuuuu
+Max Players: 8
+Description: 
+[+] Find Mods: ['1253432', '123123', '96678']
+Pulling Test (thoxvi/dont-starve-together-docker-cluster:latest)...
 ```
 
-## END
+**Other Command**
 
-- 如果有任何建议或者 Bug 可以提 issue ，或者可以邮箱联系`A@Thoxvi.com`
-- (｡･ω･｡)ﾉ♡
+```bash
+
+Usage: dst.py [OPTIONS] DIR COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  load   Load Config file
+  mods   Load mods id			
+  start  startup service
+  token  Confirm token
+```
+
+## Require
+
+**os** `Ubuntu 14.04.5 LTS \n \l`
+
+- python3
+- docker
+- docker compose
+
+You can use [InitUbuntu](https://github.com/XuCcc/InitUbuntu) to install these, ez(｡･ω･｡)ﾉ♡
+
+> [InitUbuntu](https://github.com/XuCcc/InitUbuntu) 可以帮你迅速配置好环境依赖
