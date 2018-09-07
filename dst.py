@@ -49,7 +49,7 @@ class DSTSaves(object):
 
     def load(self):
         self.config.read(str(self.path / 'cluster.ini'))
-        print("""Don't Starve Server Config
+        print("""[!] Don't Starve Server Config
 Name: {name}
 Mode: {mode}
 Password: {password}
@@ -69,9 +69,22 @@ Description: {des}""".format(name=self.config.get('NETWORK', 'cluster_name'),
         with modoverrides.open('r') as f:
             return Message.mods_pattern.findall(f.read())
 
+
+    def confirm_token(self):
+        token_file = self.path / 'cluster_token.txt'
+        with token_file.open('r') as f:
+            token = f.read().rstrip()
+        if not click.confirm('[?] Your Token [{}] is right?'.format(token),True):
+            token = click.prompt('Input Token')
+            with token_file.open('w') as f:
+                f.write(token)
+            print('[*] Token has updated!')
+
+
     def start(self, detach: bool):
+        self.confirm_token()
         self.load()
-        print('Find Mods: {}'.format(self.parse))
+        print('[+] Find Mods: {}'.format(self.parse))
         self.mods.setup(self.parse)
         docker = self.path / 'docker-compose.yml'
         with docker.open('w') as f:
@@ -106,6 +119,11 @@ class App(object):
     def mods(save):
         for id in save.parse:
             print('Mod: {}'.format(id))
+
+    @cli.command()
+    @pass_save
+    def token(save):
+        save.confirm_token()
 
     @cli.command()
     @click.option('--detach', '-d', default=False, is_flag=True, help='Run containers in the background')
